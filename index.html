@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Évaluation d'élève</title>
+    <style>
+        /* styles CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e7f7e7;
+            border: 1px solid #b4e8b4;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Évaluation d'un Élève</h1>
+        <form id="gradeForm">
+            <label for="studentName">Nom de l'élève :</label>
+            <input type="text" id="studentName" name="studentName" required>
+
+            <label for="grade">Note :</label>
+            <input type="number" id="grade" name="grade" min="0" max="20" required>
+
+            <button type="submit">Attribuer la note</button>
+        </form>
+
+        <div id="result">
+            <p id="studentResult"></p>
+        </div>
+
+        <h2>Notes des élèves</h2>
+        <table id="gradesTable">
+            <thead>
+                <tr>
+                    <th>Nom de l'élève</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Les notes seront affichées ici -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Script JavaScript
+        document.getElementById('gradeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Récupérer les valeurs du formulaire
+            const studentName = document.getElementById('studentName').value;
+            const grade = document.getElementById('grade').value;
+
+            // Vérifier si les champs sont remplis
+            if (studentName && grade >= 0 && grade <= 20) {
+                // Sauvegarder la note dans le localStorage
+                saveGrade(studentName, grade);
+
+                // Afficher la note de l'élève
+                document.getElementById('studentResult').textContent = 
+                    `${studentName} a reçu une note de ${grade}/20.`;
+
+                // Mettre à jour la table avec les nouvelles notes
+                updateGradesTable();
+            } else {
+                // Afficher un message d'erreur si les données sont invalides
+                document.getElementById('studentResult').textContent = 
+                    'Veuillez entrer un nom et une note valide entre 0 et 20.';
+            }
+        });
+
+        // Fonction pour enregistrer la note dans localStorage
+        function saveGrade(studentName, grade) {
+            let grades = JSON.parse(localStorage.getItem('grades')) || [];
+            grades.push({ studentName, grade });
+            localStorage.setItem('grades', JSON.stringify(grades));
+        }
+
+        // Fonction pour mettre à jour la table des notes
+        function updateGradesTable() {
+            const grades = JSON.parse(localStorage.getItem('grades')) || [];
+            const tableBody = document.querySelector('#gradesTable tbody');
+            tableBody.innerHTML = '';  // Vider la table avant de la remplir
+
+            grades.forEach(gradeRecord => {
+                const row = document.createElement('tr');
+                const nameCell = document.createElement('td');
+                const gradeCell = document.createElement('td');
+                
+                nameCell.textContent = gradeRecord.studentName;
+                gradeCell.textContent = gradeRecord.grade;
+                
+                row.appendChild(nameCell);
+                row.appendChild(gradeCell);
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Charger les notes au démarrage
+        updateGradesTable();
+    </script>
+
+</body>
+</html>
